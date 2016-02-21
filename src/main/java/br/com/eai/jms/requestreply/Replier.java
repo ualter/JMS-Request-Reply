@@ -6,13 +6,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.TextMessage;
 import javax.naming.NamingException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
  * @author Ualter Azambuja
  */
 public class Replier extends Thread implements Runnable {
+
+	private static Logger logger = LoggerFactory.getLogger(Replier.class);
 
 	public Replier(String name) {
 		super(name);
@@ -23,8 +33,8 @@ public class Replier extends Thread implements Runnable {
 		try {
 			logger.info("Configuring the Listener to Messaging Server");
 			// Get Queue Request
-			Destination requestQueue = (Destination) mp.ctx.lookup(REQUEST_QUEUE);
-			logger.debug("Listen on the QUEUE: {}", REQUEST_QUEUE);
+			Destination requestQueue = (Destination) mp.ctx.lookup(Configuration.getRequestQueue());
+			logger.debug("Listen on the QUEUE: {}", Configuration.getRequestQueue());
 			// Create replier for listener
 			MessageConsumer consumer = mp.session.createConsumer(requestQueue);
 			consumer.setMessageListener(requestMessage -> {
@@ -72,28 +82,28 @@ public class Replier extends Thread implements Runnable {
 						// - To do :-)
 					}
 				} catch (JMSException e) {
-					logAndThrow(e);
+					Utils.logAndThrow(e);
 				}
 			});
 			logger.info("Listening...");
 			while (true)
 				Thread.sleep(1000);
 		} catch (NamingException | JMSException e) {
-			logAndThrow(e);
+			Utils.logAndThrow(e);
 		} catch (InterruptedException e) {
-			logAndThrow(e);
+			Utils.logAndThrow(e);
 		} finally {
 			try {
 				mp.session.commit();
 			} catch (JMSException e) {
-				logAndThrow(e);
+				Utils.logAndThrow(e);
 			} finally {
 				mp.close();
 			}
 			mp.close();
 		}
 	}
-	
+
 	public Long processMathEquation(String eq) {
 		long result = 0;
 		Matcher matchNumbers = Pattern.compile("[0-9]").matcher(eq);

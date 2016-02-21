@@ -3,8 +3,15 @@ package br.com.eai.jms.requestreply;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.TextMessage;
 import javax.naming.NamingException;
-import javax.print.attribute.standard.Destination;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Requestor extends Thread implements Runnable {
 
@@ -15,6 +22,7 @@ public class Requestor extends Thread implements Runnable {
 		private final Map<String, String>	mySentMessages	= new HashMap<String, String>();
 		private Destination					replyQueue;
 		private MessagingProviderConnection	mp;
+		private static Logger logger = LoggerFactory.getLogger(Requestor.class);
 
 		public Requestor(String name, long interval, String replyQueueName, String... messagesText) {
 			super(name);
@@ -28,7 +36,7 @@ public class Requestor extends Thread implements Runnable {
 				replyQueue = (Destination) mp.ctx.lookup(replyQueueName);
 				logger.debug("Get the queue {} to LISTEN the Replies ", replyQueueName);
 			} catch (NamingException e) {
-				logAndThrow(e);
+				Utils.logAndThrow(e);
 			}
 		}
 
@@ -37,8 +45,8 @@ public class Requestor extends Thread implements Runnable {
 			try {
 				logger.info("Connection to Messaging for Send a Request");
 				// Get Queue Request
-				Destination requestQueue = (Destination) mp.ctx.lookup(REQUEST_QUEUE);
-				logger.debug("Get the queue {} to SEND Requests", REQUEST_QUEUE);
+				Destination requestQueue = (Destination) mp.ctx.lookup(Configuration.getRequestQueue());
+				logger.debug("Get the queue {} to SEND Requests", Configuration.getRequestQueue());
 
 				// Sending the Messages to the Replier
 				int index = 0;
@@ -52,7 +60,7 @@ public class Requestor extends Thread implements Runnable {
 					producer.send(requestMessage);
 					mp.session.commit();
 					logger.info("Sent {} of {} Message \"{}\" to QUEUE {}, waiting response at the QUEUE {}...", ++index, messagesText.length, messagesText,
-							REQUEST_QUEUE, replyQueueName);
+							Configuration.getRequestQueue(), replyQueueName);
 					logger.info("[ ********** MESSAGE REQUEST ********** ]");
 					logger.info("[  Message ID:" + requestMessage.getJMSMessageID() + "  ]");
 					logger.info("[  Correl. ID:" + requestMessage.getJMSCorrelationID() + "  ]");
@@ -70,7 +78,7 @@ public class Requestor extends Thread implements Runnable {
 				listenerThread.start();
 
 			} catch (NamingException | JMSException | InterruptedException e) {
-				logAndThrow(e);
+				Utils.logAndThrow(e);
 			} finally {
 				mp.close();
 			}
@@ -103,14 +111,14 @@ public class Requestor extends Thread implements Runnable {
 							mpThreadListener.session.commit();
 						}
 					} catch (JMSException e) {
-						logAndThrow(e);
+						Utils.logAndThrow(e);
 					}
 				});
 				logger.info("Listening...");
 				while (true)
 					Thread.sleep(1000);
 			} catch (JMSException | InterruptedException e) {
-				logAndThrow(e);
+				Utils.logAndThrow(e);
 			}
 		} , "RequestorListener");
 

@@ -1,9 +1,12 @@
 
 package br.com.eai.jms.requestreply;
 
-import java.sql.Connection;
 import java.util.Hashtable;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
@@ -38,7 +41,7 @@ public class MessagingProviderConnection {
 			session = connection.createSession(transacted, Session.AUTO_ACKNOWLEDGE);
 			logger.debug("Session with Queue Manager created");
 		} catch (NamingException | JMSException e) {
-			logAndThrow(e);
+			Utils.logAndThrow(e);
 		}
 	}
 
@@ -47,21 +50,21 @@ public class MessagingProviderConnection {
 			try {
 				ctx.close();
 			} catch (NamingException e) {
-				logAndThrow(e);
+				Utils.logAndThrow(e);
 			}
 		}
 		if (session != null) {
 			try {
 				session.close();
 			} catch (JMSException e) {
-				logAndThrow(e);
+				Utils.logAndThrow(e);
 			}
 		}
 		if (connection != null) {
 			try {
 				connection.close();
 			} catch (JMSException e) {
-				logAndThrow(e);
+				Utils.logAndThrow(e);
 			}
 		}
 	}

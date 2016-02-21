@@ -1,22 +1,13 @@
 package br.com.eai.jms.requestreply;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
 
@@ -34,90 +25,48 @@ import org.slf4j.LoggerFactory;
  */
 public class JMSRequestReplySample {
 
-	/**
-	 * The RefFSContextFactory used here refers to the JMS IBM MQ Implementation
-	 * In order to working and use this Connection Factory you'll have to have
-	 * this following JARs from IBM MQ Client (JMS Impl.) in your classpath.
-	 * <br>
-	 * Here is the Maven style of local jars needed:
-	 * 
-	 * <pre>
-	 *       &lt;dependency&gt;
-	 *          &lt;groupId&gt;ibm&lt;/groupId&gt;
-	 *          &lt;artifactId&gt;fscontext&lt;/artifactId&gt;
-	 *          &lt;version&gt;1.0&lt;/version&gt;
-	 *          &lt;scope&gt;system&lt;/scope&gt;
-	 *          &lt;systemPath&gt;${project.basedir}/lib/fscontext.jar&lt;/systemPath&gt;
-	 *       &lt;/dependency&gt;
-	 *       &lt;dependency&gt;
-	 *            &lt;groupId&gt;ibm&lt;/groupId&gt;
-	 *            &lt;artifactId&gt;providerutil&lt;/artifactId&gt;
-	 *            &lt;version&gt;1.0&lt;/version&gt;
-	 *            &lt;scope&gt;system&lt;/scope&gt;
-	 *            &lt;systemPath&gt;${project.basedir}/lib/providerutil.jar&lt;/systemPath&gt;
-	 *        &lt;/dependency&gt;
-	 *        &lt;dependency&gt;
-	 *            &lt;groupId&gt;ibm&lt;/groupId&gt;
-	 *            &lt;artifactId&gt;com.ibm.mqjms&lt;/artifactId&gt;
-	 *            &lt;version&gt;1.0&lt;/version&gt;
-	 *            &lt;scope&gt;system&lt;/scope&gt;
-	 *            &lt;systemPath&gt;${project.basedir}/lib/com.ibm.mqjms.jar&lt;/systemPath&gt;
-	 *        &lt;/dependency&gt;
-	 *        &lt;dependency&gt;
-	 *            &lt;groupId&gt;ibm&lt;/groupId&gt;
-	 *            &lt;artifactId&gt;com.ibm.mq.jmqi&lt;/artifactId&gt;
-	 *            &lt;version&gt;1.0&lt;/version&gt;
-	 *            &lt;scope&gt;system&lt;/scope&gt;
-	 *            &lt;systemPath&gt;${project.basedir}/lib/com.ibm.mq.jmqi.jar&lt;/systemPath&gt;
-	 *        &lt;/dependency&gt;
-	 *        &lt;dependency&gt;
-	 *            &lt;groupId&gt;ibm&lt;/groupId&gt;
-	 *            &lt;artifactId&gt;dhbcore&lt;/artifactId&gt;
-	 *            &lt;version&gt;1.0&lt;/version&gt;
-	 *            &lt;scope&gt;system&lt;/scope&gt;
-	 *            &lt;systemPath&gt;${project.basedir}/lib/dhbcore.jar&lt;/systemPath&gt;
-	 *        &lt;/dependency&gt;
-	 *         &lt;dependency&gt;
-	 *            &lt;groupId&gt;ibm&lt;/groupId&gt;
-	 *            &lt;artifactId&gt;com.ibm.mq.headers&lt;/artifactId&gt;
-	 *            &lt;version&gt;1.0&lt;/version&gt;
-	 *            &lt;scope&gt;system&lt;/scope&gt;
-	 *            &lt;systemPath&gt;${project.basedir}/lib/com.ibm.mq.headers.jar&lt;/systemPath&gt;
-	 *        &lt;/dependency&gt;
-	 * </pre>
-	 */
-	private static String	contextFactory			= "com.sun.jndi.fscontext.RefFSContextFactory";
-	/**
-	 * This URL refers actually to a binding made throughout a File created by
-	 * MQ Explorer (IBM MQ Tool)<br>
-	 * In order to be able to access the JMS Objects it's necessary have this
-	 * file locally <br>
-	 * (This is the case you don't have the JMS objects registered in a JNDI
-	 * Server Repository)
-	 */
-	private static String	url						= "file:/C:/Users/talent.uazambuja/Developer/JMS_MQ_Objects";
-	private static String	connectionFactoryName	= "UalterLocalConnectionFactory";
 	private static Logger	logger					= LoggerFactory.getLogger(JMSRequestReplySample.class);
-	private static String	REQUEST_QUEUE			= "REQUEST";
-	private static String	REPLY_QUEUE				= "REPLY";
+	private String filePropertiesJMSServer;
 
-	
-	public JMSRequestReplySample() {
+	public JMSRequestReplySample(String filePropertiesJMSServer) {
+		this.filePropertiesJMSServer = filePropertiesJMSServer;
+		Configuration.initConfiguration(this.filePropertiesJMSServer);
 	}
 
-	public void registerRequestor(String name, long interval, String replyQueueName, String... messagesText) {
-		new Requestor(name, interval, replyQueueName, messagesText).start();
+	/**
+	 * Method to register an Application Requestor (a consumer of the service). This is the application that needs some information of the 
+	 * Replier (the application responsible to provide the replies of the service). Here the Requestor register itself sending all the messages that
+	 * it needs answer from the application replier. 
+	 * 
+	 * @param name Name of the Application Requestor (consumer of the service).
+	 * @param intervalMessages Interval to send the messages, in case were sent more than one.
+	 * @param replyQueueName The Queue that the message replies must be send to, where the application requestor will be listening to get its answering.
+	 * @param messagesText A list (or only one) of messages to be sent.
+	 */
+	public void registerRequestor(String name, long intervalMessages, String replyQueueName, String... messagesText) {
+		new Requestor(name, intervalMessages, replyQueueName, messagesText).start();
 	}
 
+	/**
+	 * Method to register the Application Replier - This is the provider of the service, the application the owns the answers needed for the requestor. <BR>
+	 * It listen and gets each one of the message received at the Request Queue, and after the computation, send the message replies to the "Queue Reply" specified by the Application Requestor.
+	 * 
+	 * @param name Name of the Application Replier
+	 */
 	public void registerReplier(String name) {
 		new Replier(name).start();
 	}
 
 	public static void main(String[] args) {
 
-		JMSRequestReplySample jmsSample = new JMSRequestReplySample();
-		jmsSample.registerRequestor("RequestorApp", 1000, REPLY_QUEUE, "4 + 4 * 2");
-		jmsSample.registerRequestor("RequestorApp", 1000, REPLY_QUEUE, "3 + 2");
+		/*String filePropertiesJMS = "IBM.MQ.jms.properties";
+		if ( args != null || args.length > 0 ) {
+			filePropertiesJMS = args[0];
+		}
+		JMSRequestReplySample jmsSample = new JMSRequestReplySample(filePropertiesJMS);
+		
+		jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue() , "4 + 4 * 2");
+		jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue(), "3 + 2");
 		
 		try {
 			Thread.sleep(3000);
@@ -125,7 +74,52 @@ public class JMSRequestReplySample {
 			logAndThrow(e);
 		}
 		
-		jmsSample.registerReplier("ReplierApp");
+		jmsSample.registerReplier("ReplierApp");*/
+		
+		Hashtable environment = new Hashtable();
+		environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.fscontext.RefFSContextFactory");
+		environment.put(Context.PROVIDER_URL, "file:/C:/Users/Ualter/Downloads");
+		
+		InitialContext ctx = null;
+		Connection connection = null;
+		Session session = null;
+		try {
+			ctx = new InitialDirContext(environment);
+			System.out.println(ctx);
+			logger.debug("JDNI Context Found: {}", ctx.getNameInNamespace());
+			// Connection Factory
+			ConnectionFactory connFactory = (ConnectionFactory) ctx.lookup("ConnectionFactory");
+			// Connection
+			connection = connFactory.createConnection();
+			connection.start();
+			logger.debug("ConnectionFactory started");
+			// Session
+			boolean transacted = true;
+			session = connection.createSession(transacted, Session.AUTO_ACKNOWLEDGE);
+			logger.debug("Session with Queue Manager created");
+		} catch (NamingException | JMSException e) {
+			e.printStackTrace();
+		} finally {
+			if (ctx != null) {
+				try {
+					ctx.close();
+				} catch (NamingException e) {
+				}
+			}
+			if (session != null) {
+				try {
+					session.close();
+				} catch (JMSException e) {
+				}
+			}
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (JMSException e) {
+				}
+			}
+		}
+		
 
 	}
 
