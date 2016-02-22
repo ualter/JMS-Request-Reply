@@ -76,7 +76,7 @@ public class JMSRequestReplySample {
 		
 		jmsSample.registerReplier("ReplierApp");*/
 		
-		quickTestConnectionQueue();
+		quickTestJMSConnectionSendReceiveQueueHELLO();
 		
 	}
 	
