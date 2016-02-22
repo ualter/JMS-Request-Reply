@@ -76,16 +76,23 @@ public class JMSRequestReplySample {
 		
 		jmsSample.registerReplier("ReplierApp");*/
 		
+		quickTestConnectionQueue();
+		
+	}
+	
+	@SuppressWarnings({"unchecked","rawtypes"})
+	public static void quickTestJMSConnectionSendReceiveQueueHELLO() {
 		Hashtable environment = new Hashtable();
 		environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.fscontext.RefFSContextFactory");
-		environment.put(Context.PROVIDER_URL, "file:/C:/Users/Ualter/Downloads");
+		environment.put(Context.PROVIDER_URL, "file:/C:/Users/talent.uazambuja/Developer/git-repo/jms-request-reply/rabbitmq-bindings");
 		
 		InitialContext ctx = null;
 		Connection connection = null;
 		Session session = null;
+		MessageProducer producer = null;
+		MessageConsumer consumer = null;
 		try {
 			ctx = new InitialDirContext(environment);
-			System.out.println(ctx);
 			logger.debug("JDNI Context Found: {}", ctx.getNameInNamespace());
 			// Connection Factory
 			ConnectionFactory connFactory = (ConnectionFactory) ctx.lookup("ConnectionFactory");
@@ -97,6 +104,30 @@ public class JMSRequestReplySample {
 			boolean transacted = true;
 			session = connection.createSession(transacted, Session.AUTO_ACKNOWLEDGE);
 			logger.debug("Session with Queue Manager created");
+			
+			// Get the queue HELLO
+			logger.debug("Get the Queue HELLO from Messaging Server");
+			Destination queueHELLO = (Queue) ctx.lookup("HELLO");
+			
+			// Sending Message Test to HELLO
+			logger.debug("Sending the message \"Hello World\" to the Queue HELLO");
+			TextMessage sentMessage = session.createTextMessage("Hello World");
+			producer = session.createProducer(queueHELLO);
+			producer.send(sentMessage);
+			
+			logger.debug("Consuming the same message sent right before");
+			consumer = session.createConsumer(queueHELLO);
+			Message msg = consumer.receive(5000);
+			if ( msg instanceof TextMessage ) {
+				TextMessage receivedMessage = (TextMessage)msg;
+				logger.debug("Message received = \"{}\"", receivedMessage.getText());
+			} else {
+				logger.error("Ops! Was expected to find a Text Message at the queue, it was not!");
+			}
+			
+			logger.debug("Finish!");
+			session.commit();
+			
 		} catch (NamingException | JMSException e) {
 			e.printStackTrace();
 		} finally {
@@ -104,6 +135,18 @@ public class JMSRequestReplySample {
 				try {
 					ctx.close();
 				} catch (NamingException e) {
+				}
+			}
+			if (producer != null) {
+				try {
+					producer.close();
+				} catch (JMSException e) {
+				}
+			}
+			if (consumer != null) {
+				try {
+					consumer.close();
+				} catch (JMSException e) {
 				}
 			}
 			if (session != null) {
@@ -119,8 +162,6 @@ public class JMSRequestReplySample {
 				}
 			}
 		}
-		
-
 	}
 
 	private static void logAndThrow(Exception e) {
