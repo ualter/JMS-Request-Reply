@@ -48,3 +48,35 @@ HELLO/RefAddr/2/Encoding=String
 HELLO/RefAddr/3/Content=HELLO
 HELLO/RefAddr/3/Type=destinationName
 HELLO/RefAddr/3/Encoding=String
+
+# REQUEST Queue 
+REQUEST/ClassName=com.rabbitmq.jms.admin.RMQDestination
+REQUEST/FactoryName=com.rabbitmq.jms.admin.RMQObjectFactory
+REQUEST/RefAddr/0/Content=jms/Queue
+REQUEST/RefAddr/0/Type=name
+REQUEST/RefAddr/0/Encoding=String
+REQUEST/RefAddr/1/Content=javax.jms.Queue
+REQUEST/RefAddr/1/Type=type
+REQUEST/RefAddr/1/Encoding=String
+REQUEST/RefAddr/2/Content=com.rabbitmq.jms.admin.RMQObjectFactory
+REQUEST/RefAddr/2/Type=factory
+REQUEST/RefAddr/2/Encoding=String
+REQUEST/RefAddr/3/Content=REQUEST
+REQUEST/RefAddr/3/Type=destinationName
+REQUEST/RefAddr/3/Encoding=String
+
+# REPLY Queue 
+REPLY/ClassName=com.rabbitmq.jms.admin.RMQDestination
+REPLY/FactoryName=com.rabbitmq.jms.admin.RMQObjectFactory
+REPLY/RefAddr/0/Content=jms/Queue
+REPLY/RefAddr/0/Type=name
+REPLY/RefAddr/0/Encoding=String
+REPLY/RefAddr/1/Content=javax.jms.Queue
+REPLY/RefAddr/1/Type=type
+REPLY/RefAddr/1/Encoding=String
+REPLY/RefAddr/2/Content=com.rabbitmq.jms.admin.RMQObjectFactory
+REPLY/RefAddr/2/Type=factory
+REPLY/RefAddr/2/Encoding=String
+REPLY/RefAddr/3/Content=REPLY
+REPLY/RefAddr/3/Type=destinationName
+REPLY/RefAddr/3/Encoding=String
