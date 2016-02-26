@@ -96,6 +96,7 @@ public class Requestor extends Thread implements Runnable {
 					try {
 						if (message instanceof TextMessage) {
 							TextMessage textMessage = (TextMessage) message;
+							logger.info("Reply Message Received from Replier");
 							Utils.logQueueMessage(logger, " REPLY RECEIVED ", textMessage);
 							mpThreadListener.session.commit();
 						}
