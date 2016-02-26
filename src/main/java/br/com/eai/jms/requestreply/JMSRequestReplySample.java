@@ -4,8 +4,14 @@ import java.util.Hashtable;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -57,34 +63,36 @@ public class JMSRequestReplySample {
 		new Replier(name).start();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 
-		/*String filePropertiesJMS = "IBM.MQ.jms.properties";
-		if ( args != null || args.length > 0 ) {
+		/*String filePropertiesJMS = "RabbitMQ.jms.properties";
+		if ( args.length > 0 ) {
 			filePropertiesJMS = args[0];
 		}
 		JMSRequestReplySample jmsSample = new JMSRequestReplySample(filePropertiesJMS);
 		
 		jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue() , "4 + 4 * 2");
-		jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue(), "3 + 2");
+		//jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue(), "3 + 2");
 		
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			logAndThrow(e);
-		}
+		}*/
 		
-		jmsSample.registerReplier("ReplierApp");*/
+		//jmsSample.registerReplier("ReplierApp");
 		
 		quickTestJMSConnectionSendReceiveQueueHELLO();
 		
+
 	}
 	
 	@SuppressWarnings({"unchecked","rawtypes"})
 	public static void quickTestJMSConnectionSendReceiveQueueHELLO() {
 		Hashtable environment = new Hashtable();
-		environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.fscontext.RefFSContextFactory");
-		environment.put(Context.PROVIDER_URL, "file:/C:/Users/talent.uazambuja/Developer/git-repo/jms-request-reply/rabbitmq-bindings");
+		environment.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+		environment.put(Context.PROVIDER_URL, "tcp://localhost:61616");
 		
 		InitialContext ctx = null;
 		Connection connection = null;
@@ -114,6 +122,7 @@ public class JMSRequestReplySample {
 			TextMessage sentMessage = session.createTextMessage("Hello World");
 			producer = session.createProducer(queueHELLO);
 			producer.send(sentMessage);
+			session.commit();
 			
 			logger.debug("Consuming the same message sent right before");
 			consumer = session.createConsumer(queueHELLO);
