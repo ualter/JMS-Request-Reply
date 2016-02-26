@@ -45,16 +45,12 @@ public class Replier extends Thread implements Runnable {
 						 * "reply to" ;-)
 						 */
 						TextMessage requestTextMessage = (TextMessage) requestMessage;
-						logger.info("[ ********** MESSAGE RECEIVED ********** ]");
-						logger.info("[  Message ID:" + requestTextMessage.getJMSMessageID() + "  ]");
-						logger.info("[  Correl. ID:" + requestTextMessage.getJMSCorrelationID() + "  ]");
-						logger.info("[  Reply   To:" + requestTextMessage.getJMSReplyTo() + "  ]");
-						logger.info("[  Contents  :" + requestTextMessage.getText() + "  ]");
-						logger.info("[ ************************************** ]");
+						Utils.logQueueMessage(logger, " MESSAGE RECEIVED ", requestTextMessage);
 
 						/**
 						 * Sending the Response
 						 */
+						logger.info(Utils.separator());
 						// Get Queue for the Reply
 						Long result = processMathEquation(requestTextMessage.getText());
 						logger.debug("Answer to the queue: {}", requestMessage.getJMSReplyTo());
@@ -73,11 +69,7 @@ public class Replier extends Thread implements Runnable {
 						 */
 						if (requestMessage.getJMSReplyTo() == null)
 							logger.error("Message received does not have the replyTo configured");
-						logger.error("[ ***** ERROR MESSAGE RECEIVED ***** ]" + Thread.currentThread().getName());
-						logger.error("[  Message ID:" + requestMessage.getJMSMessageID() + "  ]");
-						logger.error("[  Correl. ID:" + requestMessage.getJMSCorrelationID() + "  ]");
-						logger.error("[  Reply   To:" + requestMessage.getJMSReplyTo() + "  ]");
-						logger.error("[ ************************************** ]");
+						Utils.logQueueMessage(logger, " MESSAGE RECEIVED ", requestMessage);
 						// Put the this Message to a ERROR queue, for instance.
 						// - To do :-)
 					}
