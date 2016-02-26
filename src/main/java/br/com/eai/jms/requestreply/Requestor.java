@@ -61,12 +61,7 @@ public class Requestor extends Thread implements Runnable {
 					mp.session.commit();
 					logger.info("Sent {} of {} Message \"{}\" to QUEUE {}, waiting response at the QUEUE {}...", ++index, messagesText.length, messagesText,
 							Configuration.getRequestQueue(), replyQueueName);
-					logger.info("[ ********** MESSAGE REQUEST ********** ]");
-					logger.info("[  Message ID:" + requestMessage.getJMSMessageID() + "  ]");
-					logger.info("[  Correl. ID:" + requestMessage.getJMSCorrelationID() + "  ]");
-					logger.info("[  Reply   To:" + requestMessage.getJMSReplyTo() + "  ]");
-					logger.info("[  Contents  :" + requestMessage.getText() + "  ]");
-					logger.info("[ ************************************** ]");
+					Utils.logQueueMessage(logger, " MESSAGE REQUEST ", requestMessage);
 
 					mySentMessages.put(requestMessage.getJMSMessageID(), requestMessage.getText());
 
@@ -101,13 +96,7 @@ public class Requestor extends Thread implements Runnable {
 					try {
 						if (message instanceof TextMessage) {
 							TextMessage textMessage = (TextMessage) message;
-							logger.info("Response Message received");
-							logger.info("[ ********** REPLY RECEIVED ********** ]");
-							logger.info("[  Message ID:" + textMessage.getJMSMessageID() + "  ]");
-							logger.info("[  Correl. ID:" + textMessage.getJMSCorrelationID() + "  ]");
-							logger.info("[  Reply   To:" + textMessage.getJMSReplyTo() + "  ]");
-							logger.info("[  Contents  :" + textMessage.getText() + "  ]");
-							logger.info("[ ************************************** ]");
+							Utils.logQueueMessage(logger, " REPLY RECEIVED ", textMessage);
 							mpThreadListener.session.commit();
 						}
 					} catch (JMSException e) {
