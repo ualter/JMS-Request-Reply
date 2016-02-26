@@ -61,6 +61,7 @@ public class Replier extends Thread implements Runnable {
 						producer.send(replyMessage);
 						logger.info("Reply Message Sent to the queue: {}", requestMessage.getJMSReplyTo());
 						mp.session.commit();
+						logger.info(Utils.separator());
 					} else {
 						/**
 						 * Ops... We receive a message to reply that there's no
