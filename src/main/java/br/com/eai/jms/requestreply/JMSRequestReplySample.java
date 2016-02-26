@@ -66,7 +66,7 @@ public class JMSRequestReplySample {
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 
-		/*String filePropertiesJMS = "RabbitMQ.jms.properties";
+		/*String filePropertiesJMS = "ActiveMQ.jms.properties";
 		if ( args.length > 0 ) {
 			filePropertiesJMS = args[0];
 		}
