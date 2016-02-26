@@ -46,16 +46,40 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.1.3</version>
 		</dependency>
+		 <!--
+          Dependencies for JDNI
+         -->
+         <dependency>
+            <groupId>providerutil.jar</groupId>
+            <artifactId>providerutil.jar</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib-rabbitmq/providerutil.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.messaging.mq</groupId>
+            <artifactId>fscontext</artifactId>
+            <version>4.6-b01</version>
+        </dependency>
 		
-		<dependency>
-			<groupId>com.sun.messaging.mq</groupId>
-			<artifactId>fscontext</artifactId>
-			<version>4.6-b01</version>
+		<!--
+		  Dependencies for ActiveMQ Apache
+		 -->
+		 <dependency>
+		    <groupId>org.apache.activemq</groupId>
+		    <artifactId>activemq-core</artifactId>
+		    <version>5.7.0</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-context</artifactId>
+		    <version>4.2.4.RELEASE</version>
+		</dependency>
+		
 		
 		<!--
 		   Dependencies for RabbitMQ JMS Client  
-		 -->
+		 
 		 <dependency>
 			<groupId>rabbitmq</groupId>
 			<artifactId>rabbitmq-jms</artifactId>
@@ -77,14 +101,7 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib-rabbitmq/amqp-client-3.1.5.jar</systemPath>
 		</dependency>
-		<dependency>
-			<groupId>providerutil.jar</groupId>
-			<artifactId>providerutil.jar</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib-rabbitmq/providerutil.jar</systemPath>
-		</dependency>
-		
+		-->
 		
 		<!--
 		 Dependencies for IBM MQ Client  
