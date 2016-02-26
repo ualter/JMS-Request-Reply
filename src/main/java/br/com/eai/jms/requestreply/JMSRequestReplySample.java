@@ -17,6 +17,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,26 +67,32 @@ public class JMSRequestReplySample {
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 
-		/*String filePropertiesJMS = "ActiveMQ.jms.properties";
+		String filePropertiesJMS = "ActiveMQ.jms.properties";
 		if ( args.length > 0 ) {
 			filePropertiesJMS = args[0];
 		}
 		JMSRequestReplySample jmsSample = new JMSRequestReplySample(filePropertiesJMS);
 		
+		logger.info(Utils.separator());
+		logger.info("Starting the requestors");
 		jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue() , "4 + 4 * 2");
 		//jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue(), "3 + 2");
+		logger.info(Utils.separator());
 		
+		logger.info("Waits 3 secs before start the Replier");
+		// Waits 3 secs before start sending requests to the replier 
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			logAndThrow(e);
-		}*/
+		}
+		// Register the Replier first
+		logger.info(Utils.separator());
+		logger.info("Start the Replier");
+		logger.info(Utils.separator());
+		jmsSample.registerReplier("ReplierApp");
 		
-		//jmsSample.registerReplier("ReplierApp");
-		
-		quickTestJMSConnectionSendReceiveQueueHELLO();
-		
-
+		//quickTestJMSConnectionSendReceiveQueueHELLO();
 	}
 	
 	@SuppressWarnings({"unchecked","rawtypes"})
