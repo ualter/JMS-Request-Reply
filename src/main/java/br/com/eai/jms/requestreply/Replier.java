@@ -50,7 +50,6 @@ public class Replier extends Thread implements Runnable {
 						/**
 						 * Sending the Response
 						 */
-						logger.info(Utils.separator());
 						// Get Queue for the Reply
 						Long result = processMathEquation(requestTextMessage.getText());
 						logger.debug("Answer to the queue: {}", requestMessage.getJMSReplyTo());
