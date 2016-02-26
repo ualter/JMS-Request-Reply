@@ -79,7 +79,6 @@ public class JMSRequestReplySample {
 		//jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue(), "3 + 2");
 		logger.info(Utils.separator());
 		
-		logger.info("Waits 3 secs before start the Replier");
 		// Waits 3 secs before start sending requests to the replier 
 		try {
 			Thread.sleep(3000);
