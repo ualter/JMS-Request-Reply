@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class Utils {
 
-	private static Logger logger = LoggerFactory.getLogger(JMSRequestReplySample.class);
+	private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
 	@SuppressWarnings("unused")
 	public static void logAndThrow(Exception e) {
