@@ -1,17 +1,15 @@
 
 package br.com.eai.jms.requestreply;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.TextMessage;
 import javax.naming.NamingException;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,44 +94,26 @@ public class Replier extends Thread implements Runnable {
 		}
 	}
 
+	/**
+	 * Using the ScriptEngineManager we look for the service provider implementation of the a JavaScript script available
+	 * and use it to perform some simple math operations. 
+	 * @param eq Equation to be resolved
+	 * @return the result of the equation resolved 
+	 */
 	public Long processMathEquation(String eq) {
 		long result = 0;
-		Matcher matchNumbers = Pattern.compile("[0-9]").matcher(eq);
-		Matcher matchOperators = Pattern.compile("(\\+|-|\\*|/)").matcher(eq);
-		List<Integer> numbers = new ArrayList<Integer>();
-		List<String> operators = new ArrayList<String>();
-		while (matchNumbers.find()) {
-			numbers.add(Integer.parseInt(matchNumbers.group()));
+		
+		ScriptEngineManager manager = new ScriptEngineManager();
+		ScriptEngine engine = manager.getEngineByName( "JavaScript" );
+		        
+		logger.debug("Using the Script Engine {}", engine.getClass().getName());
+		logger.debug("Solving the equation:\"{}\"", eq);
+		try {
+			result = Long.parseLong(engine.eval( eq ).toString());
+		} catch (ScriptException e) {
+			Utils.logAndThrow(e);
 		}
-		while (matchOperators.find()) {
-			operators.add(matchOperators.group());
-		}
-		int indexOperator = 0;
-		boolean startOperation = false;
-		for (Integer number : numbers) {
-			if (startOperation) {
-				String operator = operators.get(indexOperator++);
-				switch (operator) {
-					case "+":
-						result = (result + number);
-						break;
-					case "-":
-						result = (result - number);
-						break;
-					case "*":
-						result = (result * number);
-						break;
-					case "/":
-						result = (result / number);
-						break;
-					default:
-						break;
-				}
-			} else {
-				result = number;
-				startOperation = true;
-			}
-		}
+		logger.debug("Result of the equation:\"{} = {}\"", eq,result);
 		return result;
 	}
 }
