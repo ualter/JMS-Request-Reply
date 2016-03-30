@@ -109,6 +109,8 @@ public class Requestor extends Thread implements Runnable {
 					Thread.sleep(1000);
 			} catch (JMSException | InterruptedException e) {
 				Utils.logAndThrow(e);
+			} finally {
+				mpThreadListener.close();
 			}
 		} , "RequestorListener");
 
