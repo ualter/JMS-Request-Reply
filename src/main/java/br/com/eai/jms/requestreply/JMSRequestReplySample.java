@@ -17,7 +17,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.directory.InitialDirContext;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +63,7 @@ public class JMSRequestReplySample {
 		new Replier(name).start();
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-
 		String filePropertiesJMS = "ActiveMQ.jms.properties";
 		if ( args.length > 0 ) {
 			filePropertiesJMS = args[0];
@@ -75,15 +72,15 @@ public class JMSRequestReplySample {
 		
 		logger.info(Utils.separator());
 		logger.info("Starting the requestors");
-		jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue() , "4 + 4 * 2");
-		//jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue(), "3 + 2");
+		jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue() , "(4 + 4) * 2");
+		jmsSample.registerRequestor("RequestorApp", 1000, Configuration.getReplyQueue(), "4 + 4 * 2");
 		logger.info(Utils.separator());
 		
 		// Waits 3 secs before start sending requests to the replier 
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
-			logAndThrow(e);
+			Utils.logAndThrow(e);
 		}
 		// Register the Replier first
 		logger.info(Utils.separator());
@@ -177,11 +174,6 @@ public class JMSRequestReplySample {
 				}
 			}
 		}
-	}
-
-	private static void logAndThrow(Exception e) {
-		logger.error(e.getMessage(), e);
-		throw new RuntimeException(e.getMessage(), e);
 	}
 
 }
