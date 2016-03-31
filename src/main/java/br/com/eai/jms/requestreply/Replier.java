@@ -48,8 +48,9 @@ public class Replier extends Thread implements Runnable {
 						/**
 						 * Sending the Response
 						 */
-						// Get Queue for the Reply
+						// Process the answer
 						Long result = processMathEquation(requestTextMessage.getText());
+						// Check and Log Queue for the Reply
 						logger.debug("Answer to the queue: {}", requestMessage.getJMSReplyTo());
 						MessageProducer producer = mp.session.createProducer(requestMessage.getJMSReplyTo());
 						// Composing the Text reply message
